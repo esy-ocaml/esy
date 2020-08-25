@@ -1,0 +1,9 @@
+{
+  "name": "esy-findlib-host",
+  "dependencies": {
+    "dep": "*"
+  },
+  "resolutions": {
+    "dep": "link:./dep"
+  }
+}

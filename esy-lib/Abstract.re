@@ -5,6 +5,8 @@ module type STRING = {
   let v: string => t;
   let render: (ctx, t) => string;
 
+  let concat: (string, list(t)) => t;
+
   include S.PRINTABLE with type t := t;
   include S.COMPARABLE with type t := t;
   include S.JSONABLE with type t := t;
@@ -37,6 +39,8 @@ module String = {
 
     let v = v => v;
     let render = Core.render;
+
+    let concat = String.concat;
 
     let show = v => v;
     let pp = Fmt.string;

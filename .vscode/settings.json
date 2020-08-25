@@ -1,0 +1,6 @@
+{
+  "ocaml.sandbox": {
+    "root": "${workspaceFolder}",
+    "kind": "esy"
+  }
+}

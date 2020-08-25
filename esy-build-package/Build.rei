@@ -14,12 +14,24 @@ type t =
     installPath: EsyLib.Path.t,
     stagePath: EsyLib.Path.t,
     buildPath: EsyLib.Path.t,
+    prefixPath: EsyLib.Path.t,
     lockPath: EsyLib.Path.t,
     env: Bos.OS.Env.t,
+    files: list(file),
     build: list(Cmd.t),
     install: option(list(Cmd.t)),
     sandbox: Sandbox.sandbox,
-  };
+  }
+and file = {
+  path: EsyLib.Path.t,
+  content: string,
+};
+
+/**
+
+  Create a per-package prefix directory for storing build configs, ld.conf, etc.
+  */
+let makePrefix: (~cfg: Config.t, Plan.t) => Run.t(unit, 'b);
 
 /**
 

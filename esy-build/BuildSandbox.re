@@ -146,6 +146,7 @@ module Task = {
     let buildPath = Scope.buildPath(t.scope);
     let stagePath = Scope.stagePath(t.scope);
     let installPath = Scope.installPath(t.scope);
+    let prefixPath = Scope.prefixPath(t.scope);
     let jbuilderHackEnabled =
       switch (Scope.buildType(t.scope), Scope.sourceType(t.scope)) {
       | (JbuilderLike, Transient) => true
@@ -163,6 +164,12 @@ module Task = {
         Scope.depspec(t.scope),
       );
 
+    let files = {
+      let configs = Scope.findlibConf(t.scope);
+      let f = FindlibConf.renderConfig(~prefix=prefixPath);
+      List.map(~f, configs);
+    };
+
     {
       EsyBuildPackage.Plan.id: BuildId.show(Scope.id(t.scope)),
       name: t.pkg.name,
@@ -176,9 +183,11 @@ module Task = {
       buildPath: Scope.SandboxPath.toValue(buildPath),
       stagePath: Scope.SandboxPath.toValue(stagePath),
       installPath: Scope.SandboxPath.toValue(installPath),
+      prefixPath: Scope.SandboxPath.toValue(prefixPath),
       jbuilderHackEnabled,
       env,
       depspec,
+      files,
     };
   };
 
@@ -957,11 +966,17 @@ let exec =
       },
     );
 
+  let%bind task = task(buildspec, mode, sandbox, id);
+  let plan = Task.plan(~env, task);
+
   if (envspec.EnvSpec.buildIsInProgress) {
-    let%bind task = task(buildspec, mode, sandbox, id);
-    let plan = Task.plan(~env, task);
     EsyBuildPackageApi.buildExec(sandbox.cfg, plan, cmd);
   } else {
+    let%bind () =
+      RunAsync.ofBosError(
+        EsyBuildPackage.Build.makePrefix(~cfg=sandbox.cfg, plan),
+      );
+
     let waitForProcess = process => {
       let%lwt status = process#status;
       return(status);

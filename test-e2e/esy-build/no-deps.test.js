@@ -112,8 +112,7 @@ describe(`'esy build': simple executable with no deps`, () => {
             `/sbin`,
             ...winsysDir,
           ].join(path.delimiter),
-          OCAMLFIND_LDCONF: `ignore`,
-          OCAMLFIND_DESTDIR: `${p.projectPath}/_esy/default/store/i/${id}/lib`,
+          OCAMLFIND_CONF: `${p.projectPath}/_esy/default/store/p/${id}/etc/findlib.conf`,
           DUNE_BUILD_DIR: `${p.projectPath}/_esy/default/store/b/${id}`,
         });
       }),
@@ -165,8 +164,7 @@ describe(`'esy build': simple executable with no deps`, () => {
           cur__etc: `${p.projectPath}/_esy/default/store/i/${id}/etc`,
           cur__doc: `${p.projectPath}/_esy/default/store/i/${id}/doc`,
           cur__bin: `${p.projectPath}/_esy/default/store/i/${id}/bin`,
-          OCAMLFIND_LDCONF: `ignore`,
-          OCAMLFIND_DESTDIR: `${p.projectPath}/_esy/default/store/i/${id}/lib`,
+          OCAMLFIND_CONF: `${p.projectPath}/_esy/default/store/p/${id}/etc/findlib.conf`,
           DUNE_BUILD_DIR: `${p.projectPath}/_esy/default/store/b/${id}`,
         });
       }),

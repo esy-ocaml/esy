@@ -30,6 +30,7 @@ module PackageScope: {
   let rootPath: t => SandboxPath.t;
   let sourcePath: t => SandboxPath.t;
   let buildPath: t => SandboxPath.t;
+  let prefixPath: t => SandboxPath.t;
   let buildInfoPath: t => SandboxPath.t;
   let stagePath: t => SandboxPath.t;
   let installPath: t => SandboxPath.t;
@@ -94,6 +95,7 @@ module PackageScope: {
       let exportedEnvGlobal = {
         let path = ("PATH", "#{self.bin : $PATH}");
         let manPath = ("MAN_PATH", "#{self.man : $MAN_PATH}");
+        /* We need $OCAMLPATH until https://github.com/ocaml/dune/issues/1701 is fixed */
         let ocamlpath = ("OCAMLPATH", "#{self.lib : $OCAMLPATH}");
         [path, manPath, ocamlpath, ...exportedEnvGlobal];
       };
@@ -149,6 +151,11 @@ module PackageScope: {
   let buildPath = scope => {
     let storePath = buildStorePath(scope);
     SandboxPath.(storePath / Store.buildTree / BuildId.show(scope.id));
+  };
+
+  let prefixPath = scope => {
+    let storePath = storePath(scope);
+    SandboxPath.(storePath / Store.prefixTree / BuildId.show(scope.id));
   };
 
   let buildInfoPath = scope => {
@@ -274,20 +281,12 @@ module PackageScope: {
     ];
   };
 
-  let buildEnv = (~buildIsInProgress, _mode, scope) => {
-    let installPath =
-      if (buildIsInProgress) {
-        stagePath(scope);
-      } else {
-        installPath(scope);
-      };
-
+  let buildEnv = (~buildIsInProgress as _, _mode, scope) => {
     let p = v => SandboxValue.show(SandboxPath.toValue(v));
 
     /* add builtins */
     let env = [
-      ("OCAMLFIND_DESTDIR", p(SandboxPath.(installPath / "lib"))),
-      ("OCAMLFIND_LDCONF", "ignore"),
+      ("OCAMLFIND_CONF", p(FindlibConf.path(prefixPath(scope)))),
     ];
 
     let env = {
@@ -443,6 +442,7 @@ let storePath = scope => PackageScope.storePath(scope.self);
 let rootPath = scope => PackageScope.rootPath(scope.self);
 let sourcePath = scope => PackageScope.sourcePath(scope.self);
 let buildPath = scope => PackageScope.buildPath(scope.self);
+let prefixPath = scope => PackageScope.prefixPath(scope.self);
 let buildInfoPath = scope => PackageScope.buildInfoPath(scope.self);
 let stagePath = scope => PackageScope.stagePath(scope.self);
 let installPath = scope => PackageScope.installPath(scope.self);
@@ -450,6 +450,13 @@ let logPath = scope => PackageScope.logPath(scope.self);
 
 let pp = (fmt, scope) =>
   Fmt.pf(fmt, "Scope %a", BuildId.pp, PackageScope.id(scope.self));
+
+let find = (scope, pkgname) => {
+  open Option.Syntax;
+  let f = dep => PackageScope.name(dep.self) == pkgname;
+  let%bind found = List.find_opt(~f, scope.dependencies);
+  return(found);
+};
 
 let exposeUserEnvWith = (makeBinding, name, scope) => {
   let finalEnv =
@@ -638,6 +645,38 @@ let env = (~includeBuildEnv, ~buildIsInProgress, scope) => {
   );
 };
 
+let makeFindlibConfig = (~sysroot: SandboxPath.t, scope) => {
+  open SandboxPath;
+
+  let path = {
+    let f = depscope => toValue(installPath(depscope) / "lib");
+    let libPaths = List.map(~f, scope.dependencies);
+    let sep = System.Environment.sep(~name="OCAMLPATH", ());
+    SandboxValue.concat(sep, libPaths);
+  };
+
+  let destdir = toValue(stagePath(scope) / "lib");
+  let stdlib = toValue(sysroot / "lib" / "ocaml");
+  let commands = FindlibConf.commands(sysroot);
+  let ldconf = SandboxValue.v("ignore");
+
+  {FindlibConf.path, destdir, stdlib, ldconf, commands};
+};
+
+let findlibConf = scope =>
+  /* We only support host ocaml compiler for now */
+  if (FindlibConf.isCompiler(scope.pkg)) {
+    [];
+  } else {
+    switch (find(scope, "ocaml")) {
+    | Some(ocaml) =>
+      let sysroot = installPath(ocaml);
+      let host = makeFindlibConfig(~sysroot, scope);
+      [FindlibConf.Host(host)];
+    | None => []
+    };
+  };
+
 let toOCamlVersion = version => {
   let version = Version.showSimple(version);
   switch (String.split_on_char('.', version)) {
@@ -661,13 +700,7 @@ let toOCamlVersion = version => {
 
 let ocamlVersion = scope => {
   open Option.Syntax;
-  let f = dep =>
-    switch (PackageScope.name(dep.self)) {
-    | "ocaml" => true
-    | _ => false
-    };
-
-  let%bind ocaml = List.find_opt(~f, scope.dependencies);
+  let%bind ocaml = find(scope, "ocaml");
   return(toOCamlVersion(PackageScope.version(ocaml.self)));
 };
 

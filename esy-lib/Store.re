@@ -4,6 +4,8 @@ let installTree = "i";
 
 let buildTree = "b";
 
+let prefixTree = "p";
+
 let stageTree = "s";
 
 let version = "3";

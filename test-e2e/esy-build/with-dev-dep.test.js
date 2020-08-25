@@ -155,8 +155,7 @@ describe(`Project with "devDependencies"`, () => {
         `/usr/sbin`,
         `/sbin`,
       ].join(path.delimiter),
-      OCAMLFIND_LDCONF: `ignore`,
-      OCAMLFIND_DESTDIR: `${p.projectPath}/_esy/default/store/i/${id}/lib`,
+      OCAMLFIND_CONF: `${p.projectPath}/_esy/default/store/p/${id}/etc/findlib.conf`,
       DUNE_BUILD_DIR: `${p.projectPath}/_esy/default/store/b/${id}`,
     });
   });
@@ -194,8 +193,7 @@ describe(`Project with "devDependencies"`, () => {
         `/usr/sbin`,
         `/sbin`,
       ].join(path.delimiter),
-      OCAMLFIND_LDCONF: `ignore`,
-      OCAMLFIND_DESTDIR: `${p.projectPath}/_esy/default/store/i/${id}/lib`,
+      OCAMLFIND_CONF: `${p.projectPath}/_esy/default/store/p/${id}/etc/findlib.conf`,
       DUNE_BUILD_DIR: `${p.projectPath}/_esy/default/store/b/${id}`,
     });
   });
@@ -233,8 +231,7 @@ describe(`Project with "devDependencies"`, () => {
       cur__etc: `${p.projectPath}/_esy/default/store/i/${id}/etc`,
       cur__doc: `${p.projectPath}/_esy/default/store/i/${id}/doc`,
       cur__bin: `${p.projectPath}/_esy/default/store/i/${id}/bin`,
-      OCAMLFIND_LDCONF: `ignore`,
-      OCAMLFIND_DESTDIR: `${p.projectPath}/_esy/default/store/i/${id}/lib`,
+      OCAMLFIND_CONF: `${p.projectPath}/_esy/default/store/p/${id}/etc/findlib.conf`,
       DUNE_BUILD_DIR: `${p.projectPath}/_esy/default/store/b/${id}`,
     });
   });
@@ -278,8 +275,6 @@ describe(`Project with "devDependencies"`, () => {
       PATH: [``, `/usr/local/bin`, `/usr/bin`, `/bin`, `/usr/sbin`, `/sbin`].join(
         path.delimiter,
       ),
-      OCAMLFIND_LDCONF: `ignore`,
-      OCAMLFIND_DESTDIR: `${p.esyStorePath}/s/${depId}/lib`,
     });
   });
 
@@ -324,8 +319,6 @@ describe(`Project with "devDependencies"`, () => {
         `/usr/sbin`,
         `/sbin`,
       ].join(path.delimiter),
-      OCAMLFIND_LDCONF: `ignore`,
-      OCAMLFIND_DESTDIR: `${p.esyStorePath}/s/${devDepId}/lib`,
     });
   });
 
@@ -376,8 +369,6 @@ describe(`Project with "devDependencies"`, () => {
       cur__etc: `${p.projectPath}/_esy/default/store/i/${id}/etc`,
       cur__doc: `${p.projectPath}/_esy/default/store/i/${id}/doc`,
       cur__bin: `${p.projectPath}/_esy/default/store/i/${id}/bin`,
-      OCAMLFIND_LDCONF: `ignore`,
-      OCAMLFIND_DESTDIR: `${p.projectPath}/_esy/default/store/i/${id}/lib`,
       DUNE_BUILD_DIR: `${p.projectPath}/_esy/default/store/b/${id}`,
     });
     const envpath = env.PATH.split(path.delimiter);

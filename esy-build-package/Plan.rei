@@ -13,9 +13,15 @@ type t = {
   buildPath: Config.Value.t,
   stagePath: Config.Value.t,
   installPath: Config.Value.t,
+  prefixPath: Config.Value.t,
   env: EsyLib.Environment.Make(Config.Value).t,
+  files: list(file),
   jbuilderHackEnabled: bool,
   depspec: string,
+}
+and file = {
+  path: Config.Value.t,
+  content: Config.Value.t,
 };
 
 include EsyLib.S.COMPARABLE with type t := t;

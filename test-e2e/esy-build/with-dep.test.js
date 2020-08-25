@@ -87,7 +87,7 @@ describe('Build with dep', () => {
 
     it(
       'makes dep available in envs',
-      withProject(async p => {
+      withProject(async (p) => {
         {
           const {stdout} = await p.esy('dep.cmd');
           expect(stdout.trim()).toEqual('__dep__');
@@ -107,7 +107,7 @@ describe('Build with dep', () => {
 
     test(
       'build-env',
-      withProject(async function(p) {
+      withProject(async function (p) {
         const id = JSON.parse((await p.esy('build-plan')).stdout).id;
         const depId = JSON.parse((await p.esy('build-plan -p dep')).stdout).id;
         const depOfDepId = JSON.parse((await p.esy('build-plan -p depOfDep')).stdout).id;
@@ -150,8 +150,7 @@ describe('Build with dep', () => {
             `/sbin`,
             ...winsysDir,
           ].join(path.delimiter),
-          OCAMLFIND_LDCONF: `ignore`,
-          OCAMLFIND_DESTDIR: `${p.projectPath}/_esy/default/store/i/${id}/lib`,
+          OCAMLFIND_CONF: `${p.projectPath}/_esy/default/store/p/${id}/etc/findlib.conf`,
           DUNE_BUILD_DIR: `${p.projectPath}/_esy/default/store/b/${id}`,
         });
       }),
@@ -159,7 +158,7 @@ describe('Build with dep', () => {
 
     test.enableIf(isMacos || isLinux)(
       'macos || linux: build-env snapshot',
-      withProject(async function(p) {
+      withProject(async function (p) {
         const id = JSON.parse((await p.esy('build-plan')).stdout).id;
         const depId = JSON.parse((await p.esy('build-plan -p dep')).stdout).id;
         const depOfDepId = JSON.parse((await p.esy('build-plan -p depOfDep')).stdout).id;
@@ -172,7 +171,7 @@ describe('Build with dep', () => {
 
     test(
       'build-env dep',
-      withProject(async function(p) {
+      withProject(async function (p) {
         const id = JSON.parse((await p.esy('build-plan')).stdout).id;
         const depId = JSON.parse((await p.esy('build-plan -p dep')).stdout).id;
         const depOfDepId = JSON.parse((await p.esy('build-plan -p depOfDep')).stdout).id;
@@ -203,8 +202,7 @@ describe('Build with dep', () => {
             `/sbin`,
             ...winsysDir,
           ].join(path.delimiter),
-          OCAMLFIND_LDCONF: `ignore`,
-          OCAMLFIND_DESTDIR: `${p.esyStorePath}/s/${depId}/lib`,
+          OCAMLFIND_CONF: `${p.esyStorePath}/p/${depId}/etc/findlib.conf`,
           DUNE_BUILD_DIR: `${p.esyPrefixPath}/3/b/${depId}`,
         });
       }),
@@ -212,7 +210,7 @@ describe('Build with dep', () => {
 
     test.enableIf(isMacos || isLinux)(
       'macos || linux: build-env dep snapshot',
-      withProject(async function(p) {
+      withProject(async function (p) {
         const id = JSON.parse((await p.esy('build-plan -p dep')).stdout).id;
         const depOfDepId = JSON.parse((await p.esy('build-plan -p depOfDep')).stdout).id;
         const {stdout} = await p.esy('build-env -p dep');
@@ -222,7 +220,7 @@ describe('Build with dep', () => {
 
     test(
       'exec-env',
-      withProject(async function(p) {
+      withProject(async function (p) {
         const id = JSON.parse((await p.esy('build-plan')).stdout).id;
         const depId = JSON.parse((await p.esy('build-plan -p dep')).stdout).id;
         const {stdout} = await p.esy('exec-env --json');
@@ -236,7 +234,7 @@ describe('Build with dep', () => {
 
     test(
       'command-env',
-      withProject(async function(p) {
+      withProject(async function (p) {
         const id = JSON.parse((await p.esy('build-plan')).stdout).id;
         const depId = JSON.parse((await p.esy('build-plan -p dep')).stdout).id;
         const depOfDepId = JSON.parse((await p.esy('build-plan -p depOfDep')).stdout).id;
@@ -258,8 +256,7 @@ describe('Build with dep', () => {
           cur__etc: `${p.projectPath}/_esy/default/store/i/${id}/etc`,
           cur__doc: `${p.projectPath}/_esy/default/store/i/${id}/doc`,
           cur__bin: `${p.projectPath}/_esy/default/store/i/${id}/bin`,
-          OCAMLFIND_LDCONF: `ignore`,
-          OCAMLFIND_DESTDIR: `${p.projectPath}/_esy/default/store/i/${id}/lib`,
+          OCAMLFIND_CONF: `${p.projectPath}/_esy/default/store/p/${id}/etc/findlib.conf`,
           DUNE_BUILD_DIR: `${p.projectPath}/_esy/default/store/b/${id}`,
         });
         const envpath = env.PATH.split(path.delimiter);
@@ -291,7 +288,7 @@ describe('Build with dep', () => {
 
     it(
       'makes dep available in envs',
-      withProject(async p => {
+      withProject(async (p) => {
         {
           const {stdout} = await p.esy('dep.cmd');
           expect(stdout.trim()).toEqual('__dep__');
@@ -335,7 +332,7 @@ describe('Build with dep', () => {
     }
     it(
       'makes dep available in envs',
-      withProject(async p => {
+      withProject(async (p) => {
         {
           const {stdout} = await p.esy('dep.cmd');
           expect(stdout.trim()).toEqual('__dep__');
@@ -381,7 +378,7 @@ describe('Build with dep', () => {
 
     it(
       'makes dep available in envs',
-      withProject(async p => {
+      withProject(async (p) => {
         {
           const {stdout} = await p.esy('dep.cmd');
           expect(stdout.trim()).toEqual('__dep__');
