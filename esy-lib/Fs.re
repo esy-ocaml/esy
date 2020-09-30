@@ -388,17 +388,17 @@ let rec rmPathLwt = path => {
   };
 };
 
-let rmPath = path =>
-  try%lwt(
-    {
-      let%lwt () = rmPathLwt(path);
-      RunAsync.return();
-    }
-  ) {
-  | Unix.Unix_error(Unix.ENOENT, _, _) => RunAsync.return()
-  | Unix.Unix_error(error, _, _) =>
-    RunAsync.error(Unix.error_message(error))
-  };
+let rmPath = path => {
+   /* `Fs.rmPath` needs the same fix we made for `Bos.OS.Path.delete`
+   * readonly files need to have their readonly bit off just before
+   * deleting. (https://github.com/esy/esy/pull/1122)
+   * Temporarily commenting `Fs.rmPath` and using the Bos
+   * equivalent as a stopgap.
+   */
+  Bos.OS.Path.delete(~must_exist=false, ~recurse=true, path)
+  |> Run.ofBosError
+  |> Lwt.return
+}
 
 let randGen = lazy(Random.State.make_self_init());
 
