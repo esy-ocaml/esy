@@ -34,6 +34,18 @@ jobs:
       platform: macOS
       vmImage: macOS-latest
 
+  - template: build-cross.yml
+    parameters:
+      platform: linux_musl_arm64
+      target: linux.musl.arm64
+      vmImage: ubuntu-latest
+
+  - template: build-cross.yml
+    parameters:
+      platform: linux_musl_x86_64
+      target: linux.musl.x86_64
+      vmImage: ubuntu-latest
+
   - job: Alpine_Build
     displayName: Alpine Build
     pool:

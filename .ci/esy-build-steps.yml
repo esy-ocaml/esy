@@ -16,8 +16,8 @@ steps:
   - script: 'npm install'
     displayName: 'npm install'
   - ${{ if eq(parameters.platform,  'Ubuntu_16_04') }}:
-    - script: npm i -g esy@0.6.4
-      displayName: 'Install esy@0.6.4 for Ubuntu 16.04 (bootstrapping)'
+    - script: npm i -g @esy-nightly/esy@0.6.8-59ef85
+      displayName: 'Install @esy-nightly/esy@0.6.8-59ef85 for Ubuntu 16.04 (bootstrapping)'
   - ${{ if eq(parameters.platform,  'macOS_10_12') }}:
     - script: node scripts/create-macos-12-esy-manifest.js
       displayName: 'Build with MACOSX_DEPLOYMENT_TARGET = 10.12'

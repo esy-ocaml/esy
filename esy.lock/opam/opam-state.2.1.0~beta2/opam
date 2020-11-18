@@ -1,0 +1,37 @@
+opam-version: "2.0"
+synopsis: "opam 2.1 development libraries (state)"
+description: """
+Handling of the ~/.opam hierarchy, repository and switch states.
+"""
+maintainer: "opam-devel@lists.ocaml.org"
+authors: [
+  "Vincent Bernardoff <vb@luminar.eu.org>"
+  "Raja Boujbel <raja.boujbel@ocamlpro.com>"
+  "Roberto Di Cosmo <roberto@dicosmo.org>"
+  "Thomas Gazagnaire <thomas@gazagnaire.org>"
+  "Louis Gesbert <louis.gesbert@ocamlpro.com>"
+  "Fabrice Le Fessant <Fabrice.Le_fessant@inria.fr>"
+  "Anil Madhavapeddy <anil@recoil.org>"
+  "Guillem Rieu <guillem.rieu@ocamlpro.com>"
+  "Ralf Treinen <ralf.treinen@pps.jussieu.fr>"
+  "Frederic Tuong <tuong@users.gforge.inria.fr>"
+]
+homepage: "https://opam.ocaml.org/"
+bug-reports: "https://github.com/ocaml/opam/issues"
+dev-repo: "git+https://github.com/ocaml/opam.git"
+build: [
+  ["./configure" "--disable-checks" "--prefix" prefix]
+  ["dune" "build" "-p" name "-j" jobs]
+]
+depends: [
+  "ocaml" {>= "4.02.3"}
+  "opam-repository" {= version}
+  "dune" {>= "1.5.0"}
+]
+url {
+  src: "https://github.com/ocaml/opam/archive/2.1.0-beta2.tar.gz"
+  checksum: [
+    "md5=01a30e3469c3e8ebc04f56a3330778fa"
+    "sha512=c5f00ed4d78b1863717b44e014af1f1e8c4bc9e16ca60f1ac1216d12163d9a3b19721026d0e455429067b8ce90ec646f1be39e3daf0f3710c556da65ec6cd2c0"
+  ]
+}

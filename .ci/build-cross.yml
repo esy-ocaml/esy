@@ -1,0 +1,24 @@
+parameters:
+  platform: linux_musl_arm64
+  target: 'linux.musl.arm64'
+  vmImage: 'ubuntu-latest'
+
+jobs:
+  - job: cross_compile_${{ parameters.platform }}
+    displayName: Cross Compile ${{ parameters.platform }}
+    pool:
+      vmImage: ${{ parameters.vmImage }}
+      demands: node.js
+    steps:
+      - checkout: self
+        submodules: true
+      - template: utils/use-node.yml
+      - template: utils/use-esy.yml
+      - script: 'esy'
+        displayName: 'esy install & build'
+      - bash: |
+          esy add -D generate@EduardoRFS/reason-mobile:generate.json#5e2685f419ac88aad3d4d37932d62620c90b40d8
+          esy generate ${{ parameters.target }}
+        displayName: 'Generate wrapper'
+      - bash: esy @${{ parameters.target }}
+        displayName: 'Building for ${{ parameters.target }}'
