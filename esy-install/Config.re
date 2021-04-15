@@ -7,6 +7,17 @@ type t = {
   fetchConcurrency: option(int),
 };
 
+let cacheGCRoot = (prefixPath) => {
+  open RunAsync.Syntax;
+  let pathToProjects = Path.(prefixPath / "projects.json");
+
+  if%bind (Fs.exists(pathToProjects)) {
+    return();
+  } else {
+    Fs.writeJsonFile(`List([]), pathToProjects);
+  }
+};
+
 let make =
     (
       ~prefixPath=?,
@@ -51,6 +62,8 @@ let make =
 
   let sourceInstallPath = Path.(sourcePath / "i");
   let%bind () = Fs.createDir(sourceInstallPath);
+
+  let%bind () = cacheGCRoot(prefixPath);
 
   return({
     sourceArchivePath,

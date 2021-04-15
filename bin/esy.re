@@ -1083,6 +1083,33 @@ let fetch = (proj: Project.t) => {
   };
 };
 
+let addProjectToGCRoot = (proj: Project.t) => {
+  let projectsPath = switch(proj.projcfg.prefixPath) {
+  | Some(prefixPath) => Path.(prefixPath / "projects.json")
+  | None => Path.(EsyBuildPackage.Config.storePrefixDefault / "projects.json")
+  };
+  let currentProj = Path.show(proj.projcfg.path);
+
+  open RunAsync.Syntax;
+  let%bind json = Fs.readJsonFile(projectsPath);
+  open Json;
+  let%bind projects =
+    switch (Decode.(list(string, json))) {
+    | Ok(projects) =>
+      let projects =
+        if (List.mem(currentProj, projects)) {
+          projects;
+        } else {
+          [currentProj, ...projects];
+        };
+      Encode.(list(string, projects)) |> return;
+    | Error(err) =>
+      errorf("%s cannot be parsed", currentProj)
+    };
+
+  Fs.writeJsonFile(projects, projectsPath);
+};
+
 let solveAndFetch = (proj: Project.t) => {
   open RunAsync.Syntax;
   let lockPath = SandboxSpec.solutionLockPath(proj.projcfg.spec);
@@ -1105,6 +1132,7 @@ let solveAndFetch = (proj: Project.t) => {
     let%bind () = fetch(proj);
     return();
   };
+  addProjectToGCRoot(proj);
 };
 
 let add = (reqs: list(string), devDependency: bool, proj: Project.t) => {
