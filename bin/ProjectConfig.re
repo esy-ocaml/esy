@@ -642,7 +642,28 @@ let promiseTermForMultiplePaths = resolvedPathTerm => {
         solveCudfCommand,
         globalPathVariable,
         (),
-      ) =>
+      ) => {
+    open RunAsync.Syntax;
+    let%bind paths =
+      switch (paths) {
+      | [] =>
+        let prefixPath =
+          switch (prefixPath) {
+          | Some(path) => path
+          | None => EsyBuildPackage.Config.storePrefixDefault
+          };
+
+        let projectsPath = Path.(prefixPath / "projects.json");
+        let%bind json = Fs.readJsonFile(projectsPath);
+        let%bind json =
+          switch (Json.Decode.(list(string, json))) {
+          | Ok(json) => return(json)
+          | Error(err) =>
+            errorf("%s cannot be parsed", projectsPath |> Path.show)
+          };
+        json |> List.map(~f=Path.v) |> return;
+      | _ => return(paths)
+      };
     paths
     |> List.map(~f=path =>
          make(
@@ -670,12 +691,13 @@ let promiseTermForMultiplePaths = resolvedPathTerm => {
          )
        )
     |> RunAsync.List.joinAll;
+  };
 
   Cmdliner.Term.(
     const(parse)
     $ main_name
     $ Arg.(
-        non_empty
+        value
         & pos_all(resolvedPathTerm, [])
         & info(
             [],

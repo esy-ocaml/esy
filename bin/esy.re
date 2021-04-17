@@ -1104,7 +1104,7 @@ let addProjectToGCRoot = (proj: Project.t) => {
         };
       Encode.(list(string, projects)) |> return;
     | Error(err) =>
-      errorf("%s cannot be parsed", currentProj)
+      errorf("%s cannot be parsed", projectsPath |> Path.show)
     };
 
   Fs.writeJsonFile(projects, projectsPath);
@@ -1115,7 +1115,7 @@ let solveAndFetch = (proj: Project.t) => {
   let lockPath = SandboxSpec.solutionLockPath(proj.projcfg.spec);
   let%bind digest =
     EsySolve.Sandbox.digest(proj.workflow.solvespec, proj.solveSandbox);
-  switch%bind (SolutionLock.ofPath(~digest, proj.installSandbox, lockPath)) {
+  let%bind () = switch%bind (SolutionLock.ofPath(~digest, proj.installSandbox, lockPath)) {
   | Some(solution) =>
     switch%bind (
       EsyInstall.Fetch.maybeInstallationOfSolution(
