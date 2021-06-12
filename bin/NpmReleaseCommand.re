@@ -2,11 +2,14 @@ open EsyPackageConfig;
 open EsyInstall;
 open EsyBuild;
 
-let esyInstallReleaseJs =
-  switch (NodeResolution.resolve("./esyInstallRelease.js")) {
-  | Ok(path) => path
-  | Error(`Msg(msg)) => failwith(msg)
-  };
+let esyNativeInstallNpmReleasePath = {
+  Path.(
+    (v(Sys.argv[0]) |> parent |> parent)
+    / "lib"
+    / "esy"
+    / "esyNativeInstallNpmRelease"
+  );
+};
 
 type filterPackages =
   | ExcludeById(list(string))
@@ -731,13 +734,13 @@ let make =
         switch (releaseCfg.rewritePrefix) {
         | NoRewrite =>
           Printf.sprintf(
-            "node -e \"process.env['OCAML_VERSION']='%s'; process.env['OCAML_PKG_NAME']='%s'; require('./esyInstallRelease.js')\"",
+            "./esyInstallRelease --ocaml-version='%s' --ocaml-pkg-name='%s' --rewrite-prefix=false",
             ocamlPkgName,
             ocamlVersion,
           )
         | Rewrite =>
           Printf.sprintf(
-            "node -e \"process.env['OCAML_VERSION']='%s'; process.env['OCAML_PKG_NAME']='%s'; process.env['ESY_RELEASE_REWRITE_PREFIX']=true; require('./esyInstallRelease.js')\"",
+            "./esyInstallRelease --ocaml-version='%s' --ocaml-pkg-name='%s' --rewrite-prefix=true",
             ocamlPkgName,
             ocamlVersion,
           )
@@ -801,11 +804,11 @@ let make =
       Fs.writeFile(~data, Path.(outputPath / "package.json"));
     };
 
-    let%bind () =
-      Fs.copyFile(
-        ~src=esyInstallReleaseJs,
-        ~dst=Path.(outputPath / "esyInstallRelease.js"),
-      );
+    // let%bind () =
+    //   Fs.copyFile(
+    //     ~src=esyNativeInstallNpmReleasePath,
+    //     ~dst=Path.(outputPath / "esyInstallRelease"),
+    //   );
     let%bind () = {
       let f = filename => {
         let src = Path.(spec.path / filename);

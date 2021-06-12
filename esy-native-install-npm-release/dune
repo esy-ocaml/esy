@@ -1,0 +1,15 @@
+(executable
+ (name esyNativeInstallNpmRelease)
+ (flags
+  (:standard
+   (-w -39)
+   "-open"
+   "EsyLib"))
+ (libraries cmdliner EsyLib EsyBuild)
+ (preprocess
+  (pps lwt_ppx ppx_let)))
+
+(install
+ (section libexec)
+ (files
+  (esyNativeInstallNpmRelease.exe as esyNativeInstallNpmRelease)))
