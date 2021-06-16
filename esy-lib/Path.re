@@ -4,7 +4,9 @@ type ext = Fpath.ext;
 module Set = Fpath.Set;
 
 let v = Fpath.v;
-let (/) = Fpath.(/);
+// in Fpath / is an alias to add_seg which fails if !is_seg
+let (/) = (path, string) =>
+  Fpath.(/\/)(path, Stdlib.Result.get_ok(string |> Fpath.of_string));
 let (/\/) = Fpath.(/\/);
 
 let dirSep = Fpath.dir_sep;
