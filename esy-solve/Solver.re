@@ -794,12 +794,7 @@ let solveDependenciesNaively =
       fun
       | [] => None
       | [pkg, ...pkgs] =>
-        if (Resolver.versionMatchesReq(
-              solver.sandbox.resolver,
-              req,
-              pkg.InstallManifest.name,
-              pkg.InstallManifest.version,
-            )) {
+        if (Req.name(req) == pkg.InstallManifest.name) {
           Some(pkg);
         } else {
           findFirstMatching(pkgs);

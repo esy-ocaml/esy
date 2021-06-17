@@ -5,6 +5,7 @@ type t = {
 };
 
 let show = ({name, spec}) => name ++ "@" ++ VersionSpec.show(spec);
+let name = ({name, _}) => name;
 
 let to_yojson = req => `String(show(req));
 

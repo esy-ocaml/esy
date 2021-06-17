@@ -18,6 +18,7 @@ include S.PRINTABLE with type t := t;
 let to_yojson: Json.encoder(t);
 
 let parse: string => result(t, string);
+let name: t => string;
 
 let make: (~name: string, ~spec: VersionSpec.t) => t;
 
