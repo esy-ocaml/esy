@@ -8,7 +8,7 @@ let stageTree = "s";
 
 let version = "3";
 
-let maxStorePaddingLength = (~ocamlPkgName, ~ocamlVersion, ()) => {
+let maxStorePaddingLength = (~ocamlPkgName, ~ocamlVersion as _, ()) => {
   /*
    * This is restricted by POSIX, Linux enforces this but macOS is more
    * forgiving.
@@ -18,8 +18,7 @@ let maxStorePaddingLength = (~ocamlPkgName, ~ocamlVersion, ()) => {
    * We reserve that amount of chars from padding so ocamlrun can be placed in
    * shebang lines
    */
-  let ocamlrunStorePath =
-    ocamlPkgName ++ "-" ++ ocamlVersion ++ "-########/bin/ocamlrun";
+  let ocamlrunStorePath = ocamlPkgName ++ "-########/bin/ocamlrun";
   maxShebangLength
   - String.length("!#")
   - String.length(

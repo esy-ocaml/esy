@@ -9,6 +9,7 @@ type t;
 
 let make:
   (
+    ~ocamlPkgName: string,
     ~packageId: PackageId.t,
     ~build: BuildManifest.t,
     ~mode: BuildSpec.mode,

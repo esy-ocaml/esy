@@ -48,6 +48,7 @@ module Repr = {
 
   [@deriving yojson]
   type t = {
+    ocamlPkgName: string,
     packageId: PackageId.t,
     build,
     platform: System.Platform.t,
@@ -107,6 +108,7 @@ module Repr = {
 
   let make =
       (
+        ~ocamlPkgName,
         ~packageId,
         ~build,
         ~platform,
@@ -147,11 +149,27 @@ module Repr = {
       };
     };
 
-    {packageId, build, platform, arch, sandboxEnv, dependencies};
+    {
+      ocamlPkgName,
+      packageId,
+      build,
+      platform,
+      arch,
+      sandboxEnv,
+      dependencies,
+    };
   };
 
   let toString = repr => {
-    let {packageId, sandboxEnv, platform, arch, build, dependencies} = repr;
+    let {
+      ocamlPkgName,
+      packageId,
+      sandboxEnv,
+      platform,
+      arch,
+      build,
+      dependencies,
+    } = repr;
 
     let hash = {
       /* include parts of the current package metadata which contribute to the
@@ -180,16 +198,18 @@ module Repr = {
     let name = PackageId.name(packageId);
     let version = PackageId.version(packageId);
 
-    switch (version) {
-    | Version.Npm(_)
-    | Version.Opam(_) =>
+    switch (name == ocamlPkgName, version) {
+    | (true, _)
+    | (_, Version.Source(_)) =>
+      Printf.sprintf("%s-%s", Path.safeSeg(name), hash)
+    | (_, Version.Npm(_))
+    | (_, Version.Opam(_)) =>
       Printf.sprintf(
         "%s-%s-%s",
         Path.safeSeg(name),
         Path.safePath(Version.show(version)),
         hash,
       )
-    | Version.Source(_) => Printf.sprintf("%s-%s", Path.safeSeg(name), hash)
     };
   };
 };
@@ -198,6 +218,7 @@ type t = string;
 
 let make =
     (
+      ~ocamlPkgName,
       ~packageId,
       ~build,
       ~mode,
@@ -210,6 +231,7 @@ let make =
     ) => {
   let repr =
     Repr.make(
+      ~ocamlPkgName,
       ~packageId,
       ~build,
       ~mode,
